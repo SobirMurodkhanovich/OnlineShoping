@@ -1,98 +1,247 @@
-from django.shortcuts import render
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
 from .models import Client, Employee, Product, PhotoProduct, Order, OrderPosition
+
 from .serializer import ClientSerializers, EmployeeSerializers, ProductSerializers, PhotoProductSerializers, \
     OrderSerializers, OrderPositionSerializers
 
 
-# Create your views here.
+class ClientAPIView(APIView):
+    def get(self, request):
+        clients = Client.objects.all()
+        serializer = ClientSerializers(clients, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-class ClientCreateAPIView(CreateAPIView):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializers
-
-
-class ClientListAPIView(ListAPIView):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializers
-
-
-class ClientDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializers
+    def post(self, request):
+        serializer = ClientSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EmployeeCreateAPIView(CreateAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializers
+class ClientDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Client.objects.get(pk=pk)
+        except Client.DoesNotExist:
+            return Response(status=404)
+
+    def get(self, request, pk):
+        client = self.get_object(pk)
+        serializer = ClientSerializers(client)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        client = self.get_object(pk)
+        serializer = ClientSerializers(client, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        client = self.get_object(pk)
+        client.delete()
+        return Response(status=204)
 
 
-class EmployeeListAPIView(ListAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializers
+class EmployeeAPIView(APIView):
+    def get(self, request):
+        employee = Employee.objects.all()
+        serializer = EmployeeSerializers(employee, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = EmployeeSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EmployeeDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializers
+class EmployeeDetailAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return Employee.objects.get(pk=pk)
+        except Employee.DoesNotExist:
+            return Response(status=404)
+
+    def get(self, request, pk):
+        employee = self.get_object(pk=pk)
+        serializer = EmployeeSerializers(employee)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        employee = self.get_object(pk=pk)
+        serializer = EmployeeSerializers(employee, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        employee = self.get_object(pk=pk)
+        employee.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProductCreateAPIView(CreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializers
+class ProductAPIView(APIView):
+    def get(self, request):
+        product = Product.objects.all()
+        serializer = ProductSerializers(product, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = ProductSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProductListAPIView(ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializers
+class ProductDetailAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, pk):
+        product = self.get_object(pk=pk)
+        serializer = ProductSerializers(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        product = self.get_object(pk=pk)
+        serializer = ProductSerializers(product, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        product = self.get_object(pk=pk)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProductDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = PhotoProduct.objects.all()
-    serializer_class = PhotoProductSerializers
+class PhotoProductAPIView(APIView):
+    def get(self, request):
+        photo_product = PhotoProduct.objects.all()
+        serializer = PhotoProductSerializers(photo_product, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = PhotoProductSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PhotoProductCreateAPIView(CreateAPIView):
-    queryset = PhotoProduct.objects.all()
-    serializer_class = PhotoProductSerializers
+class PhotoProductDetailAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return PhotoProduct.objects.get(pk=pk)
+        except PhotoProduct.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, pk):
+        photo_product = self.get_object(pk=pk)
+        serializer = PhotoProductSerializers(photo_product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        photo_product = self.get_object(pk=pk)
+        serializer = PhotoProductSerializers(photo_product, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        photo_product = self.get_object(pk=pk)
+        photo_product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class PhotoProductListAPIView(ListAPIView):
-    queryset = PhotoProduct.objects.all()
-    serializer_class = PhotoProductSerializers
+class OrderAPIView(APIView):
+    def get(self, request):
+        order = Order.objects.all()
+        serializer = OrderSerializers(order, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = OrderSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PhotoProductDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = PhotoProduct.objects.all()
-    serializer_class = PhotoProductSerializers
+class OrderDetailAPIView(APIView):
+    def get_object(self, request, pk):
+        try:
+            return Order.objects.get(pk=pk)
+        except Order.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, pk):
+        order = self.get_object(pk=pk)
+        serializer = OrderSerializers(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        order = self.get_object(pk=pk)
+        serializer = OrderSerializers(order, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        order = self.get_object(pk=pk)
+        order.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class OrderCreateAPIView(APIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializers
+class OrderPositionAPIView(APIView):
+    def get(self, request):
+        order_position = OrderPosition.objects.all()
+        serializer = OrderPositionSerializers(order_position, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = OrderPositionSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class OrderListAPIView(ListAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializers
+class OrderPositionDetailAPIView(APIView):
+    def get_object(self, request, pk):
+        try:
+            return OrderPosition.objects.get(pk=pk)
+        except OrderPosition.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def get(self, request, pk):
+        order_position = self.get_object(pk=pk)
+        serializer = OrderPositionSerializers(order_position)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-class OrderDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializers
+    def put(self, request, pk):
+        order_position = self.get_object(pk=pk)
+        serializer = OrderPositionSerializers(serializer, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class OrderPositionCreateAPIView(CreateAPIView):
-    queryset = OrderPosition.objects.all()
-    serializer_class = OrderPositionSerializers
-
-
-class OrderPositionListAPIView(ListAPIView):
-    queryset = OrderPosition.objects.all()
-    serializer_class = OrderPositionSerializers
-
-
-class OrderPositionDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = OrderPosition.objects.all()
-    serializer_class = OrderPositionSerializers
+    def delete(self, request, pk):
+        order_position = self.get_object(pk=pk)
+        order_position.delete()
