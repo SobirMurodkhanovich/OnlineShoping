@@ -236,7 +236,7 @@ class OrderPositionDetailAPIView(APIView):
 
     def put(self, request, pk):
         order_position = self.get_object(pk=pk)
-        serializer = OrderPositionSerializers(serializer, data=request.data)
+        serializer = OrderPositionSerializers(order_position, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
