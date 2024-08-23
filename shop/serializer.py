@@ -30,10 +30,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'positions_', 'total_cost', 'date_time']
+        fields = ['id', 'positions', 'total_cost', 'date_time']
 
     def create(self, validated_data):
-        positions_data = validated_data.pop('positions_')
+        positions_data = validated_data.pop('positions')
         order = Order.objects.create()
         for position_data in positions_data:
             product_data = position_data.pop('product')
@@ -43,7 +43,7 @@ class OrderSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
-        positions_data = validated_data.pop('positions_', None)
+        positions_data = validated_data.pop('positions', None)
 
         if positions_data is not None:
             instance.positions.all().delete()
