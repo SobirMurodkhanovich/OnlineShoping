@@ -17,7 +17,10 @@ class Order(models.Model):
         return f"Order #{self.id} - {self.date_time}"
 
     def calculate_total_cost(self):
-        total = sum(position.get_cost() for position in self.positions.all())
+        total = 0
+        for position in self.positions.all():
+            total += position.get_cost()
+        # total = sum(position.get_cost() for position in self.positions.all())
         self.total_cost = total
         self.save()
 
